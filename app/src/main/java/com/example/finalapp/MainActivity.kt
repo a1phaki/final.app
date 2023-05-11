@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         val emailAsNode = email?.replace(".", "_")
 
         if (emailAsNode != null) {
-            userRef.child(emailAsNode).child("articles_1")
+            userRef.child(emailAsNode)
         }
     }
 }
