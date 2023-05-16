@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         auth=Firebase.auth
 
-
+        //設定
         binding.signUp.setOnClickListener{
             var intent=Intent(this,RegisterActivity::class.java)
             startActivity(intent)

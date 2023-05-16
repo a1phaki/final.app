@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.finalapp.databinding.ActivityMain2Binding
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -38,7 +39,7 @@ class MainActivity2 : AppCompatActivity() {
 
         val user=Firebase.auth.currentUser
         val send=findViewById<Button>(R.id.send)
-
+        //接收MainActivity intente過來的值
         intent?.extras?.let{
             val value=it.getString("key1")
             val email=findViewById<TextView>(R.id.email)
@@ -48,41 +49,111 @@ class MainActivity2 : AppCompatActivity() {
         val userRef = database.getReference("user")
         var i=1
         val email = user?.email
+
+        //將user的email的.取代成＿（firebase的節點不能有.)
         val emailAsNode =email?.replace(".", "_")
+
+        //
         val linearLayout = findViewById<LinearLayout>(R.id.container)
         val sortedQuery=userRef.child("articles").orderByChild("number")
-        sortedQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (childSnapshot in snapshot.children) {
-                    val values = childSnapshot.value as? HashMap<String, Any>
-                    if (values != null) {
-                        val content = values["content"] as? String
-                        val email = values["email"] as? String
-                        val number = values["number"] as? Long
-                        val date=values["date"]as?String
+//        //設定資料庫中的單次觸發事件 將資料庫中articles節點的子節點依照"number"的值來排序
+//        sortedQuery.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                for (childSnapshot in snapshot.children) {
+//                    val values = childSnapshot.value as? HashMap<String, Any>
+//
+//                    if (values != null) {
+//                        //設定取得的values資料指定為content,email,number,date
+//                        val content = values["content"] as? String
+//                        val email = values["email"] as? String
+//                        val number = values["number"] as? Long
+//                        val date=values["date"]as?String
+//
+//                        //新增的textview
+//                        val textView = TextView(this@MainActivity2)
+//                        //設定textview中的文字
+//                        textView.text = email.toString() + " : \n\n" + content + "\n\n"+date+"\n-------------------------------------------------------------------"
+//                        val params = LinearLayout.LayoutParams(
+//                            LinearLayout.LayoutParams.WRAP_CONTENT,
+//                            LinearLayout.LayoutParams.WRAP_CONTENT
+//                        )
+//                        params.height = 400 // 設定高度為 400 像素
+//                        textView.layoutParams = params //將textview的layout參數設定為params
+//                        textView.textSize = 20f //設定textview的文字大小
+//
+//                        linearLayout.addView(textView,0) //將textview加入到指定的linearLayout並指定index為0(將新增的text加到linearLayout的最上方）
+//                        i = i + 1 //紀錄跑的迴圈次數
+//                    }
+//                }
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                print("error")
+//            }
+//        })
+        sortedQuery.addChildEventListener(object :ChildEventListener{
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val values = snapshot.value as? HashMap<String, Any>
 
-                        // 建立 TextView 並設定值
-                        val textView = TextView(this@MainActivity2)
-                        textView.text = email.toString() + " : \n\n" + content + "\n\n"+date+"\n-------------------------------------------------------------------"
-                        val params = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        params.height = 400 // 設定高度為 100 像素
-                        textView.layoutParams = params
-                        textView.textSize = 20f
-                        // 將 TextView 新增到你的 layout 中
-                        linearLayout.addView(textView,0)
-                        i = i + 1
-                    }
+                if (values != null) {
+                    //設定取得的values資料指定為content,email,number,date
+                    val content = values["content"] as? String
+                    val email = values["email"] as? String
+                    val number = values["number"] as? Long
+                    val date=values["date"]as?String
+                    //新增的textview
+                    val textView = TextView(this@MainActivity2)
+                    //設定textview中的文字
+                    textView.text = email.toString() + " : \n\n" + content + "\n\n"+date+"\n-------------------------------------------------------------------"
+                    val params = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    params.height = 400 // 設定高度為 400 像素
+                    textView.layoutParams = params //將textview的layout參數設定為params
+                    textView.textSize = 20f //設定textview的文字大小
 
-                    // 在這裡處理排序後的資料
-
+                    linearLayout.addView(textView,0) //將textview加入到指定的linearLayout並指定index為0(將新增的text加到linearLayout的最上方）
+                    i = i + 1 //紀錄跑的迴圈次數
                 }
             }
 
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val values = snapshot.value as? HashMap<String, Any>
+
+                if (values != null) {
+                    //設定取得的values資料指定為content,email,number,date
+                    val content = values["content"] as? String
+                    val email = values["email"] as? String
+                    val number = values["number"] as? Long
+                    val date=values["date"]as?String
+                    //新增的textview
+                    val textView = TextView(this@MainActivity2)
+                    //設定textview中的文字
+                    textView.text = email.toString() + " : \n\n" + content + "\n\n"+date+"\n-------------------------------------------------------------------"
+                    val params = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    params.height = 400 // 設定高度為 400 像素
+                    textView.layoutParams = params //將textview的layout參數設定為params
+                    textView.textSize = 20f //設定textview的文字大小
+
+                    linearLayout.addView(textView,0) //將textview加入到指定的linearLayout並指定index為0(將新增的text加到linearLayout的最上方）
+                    i = i + 1 //紀錄跑的迴圈次數
+                }
+            }
+
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
             override fun onCancelled(error: DatabaseError) {
-                // 處理錯誤事件
+
             }
         })
 
@@ -90,8 +161,6 @@ class MainActivity2 : AppCompatActivity() {
         send.setOnClickListener{
             val Text=findViewById<EditText>(R.id.sendarticle)
             val article=Text.text.toString()
-            //新增的textview
-            val textView=TextView(this)
             val currentTime = Date()
 
             // 設定時間的格式
@@ -108,19 +177,9 @@ class MainActivity2 : AppCompatActivity() {
             //在articles的節點下加入子節點articles"i"並設定值為articles
             userRef.child("articles").child("articles"+i).setValue(articles)
 
-            textView.text=articles["email"].toString()+" :\n\n"+articles["content"].toString()+"\n\n"+formattedTime+"\n-------------------------------------------------------------------"
-            val params = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            params.height = 400 // 設定高度為 400 像素
-            textView.layoutParams = params //將textview的layout參數設定為params
-            textView.textSize=20f //設定textview的文字大小
 
-
-            linearLayout.addView(textView,0)//將textview加入到指定的linearLayout並指定index為0(將新增的text
-            i=i+1
         }
+        //logout按鈕觸發事件
         binding.logout.setOnClickListener {
             var intent= Intent(this,MainActivity::class.java)
             startActivity(intent)
