@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity() {
                     println("------signInWithEmail:success------")
                     val user=auth.currentUser
                     updateUI(user)
-                    Create(user)
                 }else{
                     it.exception?.message?.let {  }
                     println("------error------")
@@ -102,23 +101,5 @@ class MainActivity : AppCompatActivity() {
             binding.jump.visibility=View.GONE
         }
     }
-    private fun Create(user: FirebaseUser?) {
-        // 获取当前已登录用户对象
-        val user = Firebase.auth.currentUser
 
-// 获取用户的邮箱
-        val email = user?.email
-
-// 获取 Firebase Realtime Database 实例
-        val database = Firebase.database
-// 获取要设置的节点引用
-        val userRef = database.getReference("user")
-
-// 将邮箱设置到节点上
-        val emailAsNode = email?.replace(".", "_")
-
-        if (emailAsNode != null) {
-            userRef.child(emailAsNode)
-        }
-    }
 }
